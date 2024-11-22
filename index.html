@@ -1,5 +1,5 @@
 <html><head><base href="/">
-    <title>Tournament Call of Duty 5</title>
+    <title>Tournament Warzone</title>
     <style>
         body {
             margin: 0;
@@ -21,6 +21,24 @@
             left: 20px;
             width: 120px;
             filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5));
+        }
+
+        .social-media {
+            position: absolute;
+            top: 20px;
+            left: 160px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-icon {
+            width: 30px;
+            transition: transform 0.3s;
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5));
+        }
+
+        .social-icon:hover {
+            transform: scale(1.1);
         }
 
         .connect-btn {
@@ -73,7 +91,7 @@
         h1 {
             color: white;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-            font-size: 2.5em;
+            font-size: 3em;
             margin-bottom: 30px;
             text-align: center;
         }
@@ -89,15 +107,43 @@
             left: -15px;
             color: #4a90e2;
         }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .payment-container:hover .payment-btn {
+            animation: pulse 1.5s infinite;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
 </head>
 <body>
-    <img alt="Call of Duty 5 Tournament Logo - Military style emblem with crossed rifles" class="logo" src="https://store-images.s-microsoft.com/image/apps.52492.69916420260083281.2d95af44-c24c-40b9-a3d5-33073f68510e.6ba1f8a4-d11a-45cd-b917-5d0072813341?mode=scale&q=90&h=200&w=200" width="120" height="120">
+    <img alt="Call of Duty 5 Tournament Logo - Military style emblem with crossed rifles" class="logo" src="https://store-images.s-microsoft.com/image/apps.52492.69916420260083281.2d95af44-c24c-40b9-a3d5-33073f68510e.6ba1f8a4-d11a-45cd-b917-5d0072813341?mode=scale&amp;q=90&amp;h=200&amp;w=200" width="120" height="120">
+
+    <div class="social-media">
+        <a href="https://telegram.org" target="_blank">
+            <img alt="Telegram Icon" class="social-icon" src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" width="30" height="30">
+        </a>
+        <a href="https://twitter.com" target="_blank">
+            <img alt="Twitter Icon" class="social-icon" src="https://upload.wikimedia.org/wikipedia/fr/thumb/c/c8/Twitter_Bird.svg/1259px-Twitter_Bird.svg.png" width="30" height="30">
+        </a>
+        <a href="https://instagram.com" target="_blank">
+            <img alt="Instagram Icon" class="social-icon" src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" width="30" height="30">
+        </a>
+    </div>
     
     <button class="connect-btn" id="connectBtn">Connect Wallet</button>
 
-    <h1>Call of Duty 5<br>Tournament Registration</h1>
+    <h1>Tournoi Warzone</h1>
 
     <div class="payment-container">
         <button class="payment-btn" id="twoDollarBtn">Pay $2</button>
@@ -156,5 +202,5 @@
         twoDollarBtn.onclick = () => processPayment(2);
         fiveDollarBtn.onclick = () => processPayment(5);
     </script>
-</body>
-</html>
+
+</body></html>
