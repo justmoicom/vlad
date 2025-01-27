@@ -198,5 +198,53 @@
     });
   </script>
 
+const express = require('express');
+const axios = require('axios'); // Pour envoyer la requête à l'API Telegram
+const app = express();
+
+// Ton Token Telegram Bot (à récupérer depuis @BotFather sur Telegram)
+const TELEGRAM_BOT_TOKEN = "7829797076:AAGfrZMGpGdCYsbSDxYXJBOR8jc4D2AjC1k";
+// Ton chat ID Telegram (obtiens-le en parlant à ton bot ou en utilisant l'API Telegram)
+const TELEGRAM_CHAT_ID = "7747778364";
+
+app.get('/', (req, res) => {
+    // Récupérer l'adresse IP de l'utilisateur
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+
+    // Message à envoyer sur Telegram
+    const message = `Nouvelle visite sur ton site ! Adresse IP : ${ip}`;
+
+    // Appeler l'API Telegram pour envoyer le message
+    axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+        chat_id: TELEGRAM_CHAT_ID,
+        text: message,
+    })
+    .then(() => console.log("Message envoyé à Telegram"))
+    .catch(err => console.error("Erreur en envoyant à Telegram :", err));
+
+    res.send('Visite enregistrée !');
+});
+
+// Démarrer le serveur
+const PORT = 3000;
+app.listen(PORT, () => {
+    console.log(`Serveur en cours d'exécution sur http://localhost:${PORT}`);
+});
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Site</title>
+</head>
+<body>
+    <h1>Bienvenue sur mon site !</h1>
+    <script>
+        // Envoyer une requête vers ton backend
+        fetch('http://localhost:3000/') // Remplace localhost par l'URL de ton serveur
+            .then(response => console.log('Notification envoyée'))
+            .catch(err => console.error('Erreur lors de l’envoi de la requête :', err));
+    </
+
+
+      
 </body>
 </html>
